@@ -81,7 +81,19 @@ allCodes' n accs = allCodes' (n-1) [(color:acc) | color <- colors, acc <- accs]
 -- Exercise 7 -----------------------------------------
 
 solve :: Code -> [Move]
-solve = undefined
+solve code = solve' code guesses [move]
+    where
+        guess:guesses = allCodes $ length code
+        move = getMove code guess
+
+solve' :: Code -> [Code] -> [Move] -> [Move]
+solve' code guesses (move:moves)
+    | length code == exact = reverse (move:moves)
+    | otherwise = solve' code newGuesses (newMove:move:moves)
+    where
+        Move _ exact _nonexact = move
+        newGuess:newGuesses = filterCodes move guesses
+        newMove = getMove code newGuess
 
 -- Bonus ----------------------------------------------
 

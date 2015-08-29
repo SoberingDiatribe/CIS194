@@ -56,4 +56,4 @@ type Move = (Peg, Peg)
 hanoi :: Integer -> Peg -> Peg -> Peg -> [Move]
 hanoi n start end storage
     | n == 1 = [(start, end)]
-    | otherwise = (hanoi (n-1) start storage end) ++ [(start, end)] ++ (hanoi (n-1) storage end start)
+    | otherwise = (hanoi (n-1) start storage end) ++ [(start, end)] : (hanoi (n-1) storage end start)

@@ -5,41 +5,65 @@ module HW05 where
 import Data.ByteString.Lazy (ByteString)
 import Data.Map.Strict (Map)
 import System.Environment (getArgs)
+import Data.Bits (xor)
 
 import qualified Data.ByteString.Lazy as BS
 import qualified Data.Map.Strict as Map
 
 import Parser
 
+-- Paths Variables ------------------------------------
+dogJPG, dogOrigJPG, victimsJSON :: String
+dogJPG = "clues\\dog.jpg"
+dogOrigJPG = "clues\\dog-original.jpg"
+victimsJSON = "clues\\victims.json"
+
 -- Exercise 1 -----------------------------------------
 
 getSecret :: FilePath -> FilePath -> IO ByteString
-getSecret = undefined
+getSecret new old = do
+    newBS <- BS.readFile new
+    oldBS <- BS.readFile old
+    return $ BS.pack $ filter (/=0) $ BS.zipWith xor newBS oldBS
 
 -- Exercise 2 -----------------------------------------
 
 decryptWithKey :: ByteString -> FilePath -> IO ()
-decryptWithKey = undefined
+decryptWithKey key file = do
+    fileBS <- BS.readFile $ (file ++ ".enc")
+    let infKey = BS.pack $ cycle $ BS.unpack key
+    BS.writeFile file $ BS.pack $ BS.zipWith xor fileBS infKey
 
 -- Exercise 3 -----------------------------------------
 
 parseFile :: FromJSON a => FilePath -> IO (Maybe a)
-parseFile = undefined
+parseFile file = do
+    fileBS <- BS.readFile file
+    return $ decode fileBS
 
 -- Exercise 4 -----------------------------------------
 
 getBadTs :: FilePath -> FilePath -> IO (Maybe [Transaction])
-getBadTs = undefined
+getBadTs victims transactions = do
+    tidsMaybe <- parseFile victims :: IO (Maybe [TId])
+    transMaybe <- parseFile transactions :: IO (Maybe [Transaction])
+    return $ case (tidsMaybe, transMaybe) of
+                (Nothing, _) -> Nothing
+                (_, Nothing) -> Nothing
+                (Just tids, Just trans) -> Just (filter (\x -> (tid x) `elem` tids) trans)
 
 -- Exercise 5 -----------------------------------------
 
 getFlow :: [Transaction] -> Map String Integer
-getFlow = undefined
+getFlow transactions = foldr updateMap Map.empty transactions
+
+updateMap :: Transaction -> Map String Integer -> Map String Integer
+updateMap transaction mapData = Map.insertWith (+) (to transaction) (amount transaction) (Map.insertWith (+) (from transaction) ((-1) * (amount transaction)) mapData)
 
 -- Exercise 6 -----------------------------------------
 
 getCriminal :: Map String Integer -> String
-getCriminal = undefined
+getCriminal mapData = fst foldr (\a@(_, (maximum $ Map.elems mapData
 
 -- Exercise 7 -----------------------------------------
 

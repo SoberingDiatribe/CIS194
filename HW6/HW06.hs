@@ -7,15 +7,19 @@ import Data.Functor
 -- Exercise 1 -----------------------------------------
 
 fib :: Integer -> Integer
-fib = undefined
+fib 0 = 1
+fib 1 = 1
+fib n
+    | n < 0 = 0
+    | otherwise = (fib (n-1)) + (fib (n-2))
 
 fibs1 :: [Integer]
-fibs1 = undefined
+fibs1 = map fib [0..]
 
 -- Exercise 2 -----------------------------------------
 
 fibs2 :: [Integer]
-fibs2 = undefined
+fibs2 = 1 : 1 : (zipWith (+) fibs2 (tail fibs2))
 
 -- Exercise 3 -----------------------------------------
 
@@ -27,34 +31,34 @@ instance Show a => Show (Stream a) where
              ++ ",..."
 
 streamToList :: Stream a -> [a]
-streamToList = undefined
+streamToList (Cons a b) = a : streamToList b
 
 -- Exercise 4 -----------------------------------------
 
 instance Functor Stream where
-    fmap = undefined
+    fmap f (Cons a b) = Cons (f a) (fmap f b)
 
 -- Exercise 5 -----------------------------------------
 
 sRepeat :: a -> Stream a
-sRepeat = undefined
+sRepeat a = Cons a (sRepeat a)
 
 sIterate :: (a -> a) -> a -> Stream a
-sIterate = undefined
+sIterate f a = Cons a (sIterate f (f a))
 
 sInterleave :: Stream a -> Stream a -> Stream a
-sInterleave (Cons _ _) _ = undefined
+sInterleave (Cons a b) stream = Cons a (sInterleave stream b)
 
 sTake :: Int -> Stream a -> [a]
-sTake = undefined
+sTake n stream = take n $ streamToList stream
 
 -- Exercise 6 -----------------------------------------
 
 nats :: Stream Integer
-nats = undefined
+nats = sIterate (+1) 0
 
 ruler :: Stream Integer
-ruler = undefined
+ruler = Cons 0 (sInterleave (sIterate (+1) 1)
 
 -- Exercise 7 -----------------------------------------
 
